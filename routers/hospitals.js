@@ -1,8 +1,8 @@
 const { Hospital } = require('../models/hospitalModel');
 const express = require('express');
-const router = express.Router();
+const hospitalsRouter = express.Router();
 
-router.get(`/`, async (req, res)=>{
+hospitalsRouter.get(`/`, async (req, res)=>{
     const hospitalList = await Hospital.find();
 
     if(!hospitalList) {
@@ -12,7 +12,7 @@ router.get(`/`, async (req, res)=>{
     res.send(hospitalList);
 });
 
-router.get(`/:id`, async(req,res)=>{
+hospitalsRouter.get(`/:id`, async(req,res)=>{
     const hospital = await Hospital.findById(req.params.id);
 
     if(!hospital) {
@@ -22,7 +22,7 @@ router.get(`/:id`, async(req,res)=>{
 });
 
 // Filter
-router.get(`/get/hospital`, async (req, res) => {
+hospitalsRouter.get(`/get/hospital`, async (req, res) => {
     const hospital = await Hospital.find({isHospital: true})
 
     if(!hospital) {
@@ -32,7 +32,7 @@ router.get(`/get/hospital`, async (req, res) => {
     res.send(hospital);
 });
 
-router.get(`/get/general`, async (req, res) => {
+hospitalsRouter.get(`/get/general`, async (req, res) => {
     const hospital = await Hospital.find({isGeneral: true})
 
     if(!hospital) {
@@ -42,7 +42,7 @@ router.get(`/get/general`, async (req, res) => {
     res.send(hospital);
 });
 
-router.get(`/get/private`, async (req, res) => {
+hospitalsRouter.get(`/get/private`, async (req, res) => {
     const hospital = await Hospital.find({isPrivate: true})
 
     if(!hospital) {
@@ -52,7 +52,7 @@ router.get(`/get/private`, async (req, res) => {
     res.send(hospital);
 });
 
-router.get(`/get/childrens`, async (req, res) => {
+hospitalsRouter.get(`/get/childrens`, async (req, res) => {
     const hospital = await Hospital.find({isChildrens: true})
 
     if(!hospital) {
@@ -62,7 +62,7 @@ router.get(`/get/childrens`, async (req, res) => {
     res.send(hospital);
 });
 
-router.get(`/get/clinic`, async (req, res) => {
+hospitalsRouter.get(`/get/clinic`, async (req, res) => {
     const hospital = await Hospital.find({isClinic: true})
 
     if(!hospital) {
@@ -72,7 +72,7 @@ router.get(`/get/clinic`, async (req, res) => {
     res.send(hospital);
 });
 
-router.post(`/`, async (req, res)=>{
+hospitalsRouter.post(`/`, async (req, res)=>{
     let hospital = new Hospital({
         hospiName: req.body.hospiName,
         hospiAddress: req.body.hospiAddress,
@@ -90,7 +90,7 @@ router.post(`/`, async (req, res)=>{
     res.send(hospital)
 });
 
-router.put(`/:id`,async (req, res)=> {
+hospitalsRouter.put(`/:id`,async (req, res)=> {
     const hospital = await Hospital.findByIdAndUpdate(
         req.params.id,
         {
@@ -112,7 +112,7 @@ router.put(`/:id`,async (req, res)=> {
     res.send(hospital);
 });
 
-router.delete(`/:id`, (req, res) => {
+hospitalsRouter.delete(`/:id`, (req, res) => {
     Hospital.findByIdAndRemove(req.params.id).then(hospital => {
         if(hospital) {
             return res.status(200).json({success: true, message: 'The hospital is deleted.'})
@@ -124,4 +124,4 @@ router.delete(`/:id`, (req, res) => {
     })
 });
 
-module.exports = router;
+module.exports = hospitalsRouter;

@@ -1,9 +1,9 @@
 const express = require('express');
-const router = express.Router();
+const requestsRouter = express.Router();
 const { Request } = require('../models/requestModel');
 const { RequestPatient } = require('../models/requestPatientModel');
 
-router.get(`/`, async (req, res)=>{
+requestsRouter.get(`/`, async (req, res)=>{
     const requestList = await Request.find();
 
     if(!requestList) {
@@ -13,7 +13,7 @@ router.get(`/`, async (req, res)=>{
     res.send(requestList);
 });
 
-router.post(`/`, async (req, res)=>{
+requestsRouter.post(`/`, async (req, res)=>{
     const requestPatientIds = Promise.all(req.body.requestPatient.map(async requestPatient => {
         let newRequestPatient = new RequestPatient({
             patient: requestPatient.patient,
@@ -44,7 +44,7 @@ router.post(`/`, async (req, res)=>{
 });
 
 // Hospital Update
-// router.put('/:id', async (req, res)=> {
+// requestsRouter.put('/:id', async (req, res)=> {
 //     const request = await Request.findByIdAndUpdate(
 //         req.params.id,
 //         {
@@ -60,4 +60,4 @@ router.post(`/`, async (req, res)=>{
 //     res.send(request);
 // });
 
-module.exports = router;
+module.exports = requestsRouter;

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const patientSchema = mongoose.Schema(
     {
-        // _id: { type: Number, unique: true },
+        // _id: { type: mongoose.SchemaTypes.ObjectId, unique: true },
         username: { type: String, required: true, unique: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true },
@@ -15,10 +15,10 @@ const patientSchema = mongoose.Schema(
         birthYear: { type: Number, required: true },
         age: { type: Number, required: false },
         contact: { type: Number, required: true },
-        date: { type: Date, default: Date.now },
-        timeRequested: { type: String, required: true },
-        timeResponded: { type: String, required: false },
-        status: { type: String, required: false },
+        // date: { type: Date, default: Date.now },
+        // timeRequested: { type: String, required: true },
+        // timeResponded: { type: String, required: false },
+        // status: { type: String, required: false },
 
         // Medical Information
         chkDiabetes: { type: Boolean, default: false, required: false },
@@ -42,9 +42,9 @@ const patientSchema = mongoose.Schema(
         environmentalInfo: { type: String, required: false },
         surgeryCount: { type: Number, required: false },
         surgeryInfo: { type: String, required: false },
-        surgeryMonth: { type: Number, required: false },
-        surgeryDate: { type: Number, required: false },
-        surgeryYear: { type: Number, required: false },
+        surgeryMonth: { type: String, required: false },
+        surgeryDate: { type: String, required: false },
+        surgeryYear: { type: String, required: false },
         surgeryHospital: { type: String, required: false },
     },
     {
@@ -52,4 +52,13 @@ const patientSchema = mongoose.Schema(
     }
 );
 
+patientSchema.virtual('id').get(function () {
+    return this._id.toHexString();
+});
+
+patientSchema.set('toJSON', {
+    virtuals: true,
+});
+
 exports.Patient = mongoose.model('Patient', patientSchema);
+exports.patientSchema = patientSchema;

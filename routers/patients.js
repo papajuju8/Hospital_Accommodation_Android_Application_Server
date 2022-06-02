@@ -1,12 +1,12 @@
 const { Patient } = require('../models/patientModel');
-// const data = require('../data');
 const bcrypt = require('bcrypt');
 const expressAsyncHandler = require('express-async-handler');
 const jwt = require('jsonwebtoken');
 const express = require('express');
-const router = express.Router();
+const patientsRouter = express.Router();
+const data = require('../data');
 
-router.get(`/`, async (req, res)=>{
+patientsRouter.get(`/`, async (req, res)=>{
     // const patientList = await Patient.find();
     const patientList = await Patient.find().select('-password');
 
@@ -14,10 +14,9 @@ router.get(`/`, async (req, res)=>{
         res.status(500).json({success: false})
     }
     res.send(patientList);
-    // res.send(data.patients);
 });
 
-router.get(
+patientsRouter.get(
     '/seed',
     expressAsyncHandler(async (req, res) => {
         await Patient.remove({});
@@ -26,17 +25,7 @@ router.get(
     })
 );
 
-router.get(`/:id`, async(req, res)=> {
-    // const patient = await Patient.findById(req.params.id);
-    const patient = await Patient.findById(req.params.id).select('-password');
-
-    if(!patient) {
-        res.status(500).json({message: 'The user with the given ID was not found.'});
-    }
-    res.status(200).send(patient);
-});
-
-router.post(`/`, (req, res)=>{
+patientsRouter.post(`/`, (req, res)=>{
     const patient = new Patient({
         username: req.body.username,
         email: req.body.email,
@@ -49,10 +38,10 @@ router.post(`/`, (req, res)=>{
         birthYear: req.body.birthYear,
         age: req.body.age,
         contact: req.body.contact,
-        date: req.body.date,
-        timeRequested: req.body.timeRequested,
-        timeResponded: req.body.timeResponded,
-        status: req.body.status,
+        // date: req.body.date,
+        // timeRequested: req.body.timeRequested,
+        // timeResponded: req.body.timeResponded,
+        // status: req.body.status,
         
         // Medical Information
         chkDiabetes: req.body.chkDiabetes,
@@ -92,7 +81,7 @@ router.post(`/`, (req, res)=>{
     });
 });
 
-router.post(`/login`, async(req, res)=>{
+patientsRouter.post(`/login`, async (req, res)=>{
     const patient = await Patient.findOne({email: req.body.email});
     const secret = process.env.secret;
 
@@ -100,24 +89,22 @@ router.post(`/login`, async(req, res)=>{
         return res.status(400).send('The user is not found');
     };
 
-    if(patient) {
-        if(bcrypt.compareSync(req.body.password, patient.password)) {
-            const token = jwt.sign(
-                {
-                    patientId: patient.id
-                },
-                secret,
-                // {expiresIn: '90d'} no expiresIn, no expiration
-            )
+    if(patient && bcrypt.compareSync(req.body.password, patient.password)) {
+        const token = jwt.sign(
+            {
+                patientId: patient.id
+            },
+            secret,
+            //{expiresIn: '30d'} no expiresIn, no expiration
+        )
 
-            res.status(200).send({patient: patient.email, token: token})
-        } else {
-            res.status(400).send('Password is incorrect')
-        }
+        res.status(200).send({patient: patient.email, token: token})
+    } else {
+        res.status(400).send('Password is incorrect')
     }
 });
 
-router.post(`/register`, async(req, res)=>{
+patientsRouter.post(`/register`, async(req, res)=>{
     let patient = new Patient(
         {
             _id: req.body._id,
@@ -132,10 +119,10 @@ router.post(`/register`, async(req, res)=>{
             birthYear: req.body.birthYear,
             age: req.body.age,
             contact: req.body.contact,
-            date: req.body.date,
-            timeRequested: req.body.timeRequested,
-            timeResponded: req.body.timeResponded,
-            status: req.body.status,
+            // date: req.body.date,
+            // timeRequested: req.body.timeRequested,
+            // timeResponded: req.body.timeResponded,
+            // status: req.body.status,
             
             // Medical Information
             chkDiabetes: req.body.chkDiabetes,
@@ -178,4 +165,24 @@ router.post(`/register`, async(req, res)=>{
     res.send(patient);
 });
 
-module.exports = router;
+patientsRouter.get(`/:id`, async(req, res)=> {
+    const patient = await Patient.findById(req.params.id).select('-password');
+
+    if(!patient) {
+        return res.status(500).json({message: 'The user with the given ID was not found.'});
+    }
+    return res.status(200).send(patient);
+});
+
+patientsRouter.get(`/get/count`, async (req, res) => {
+    const patientCount = await Patient.countDocuments();
+
+    if(!patientCount) {
+        res.status(500).json({success: false})
+    }
+    res.send({
+        patientCount: patientCount
+    });
+});
+
+module.exports = patientsRouter;
